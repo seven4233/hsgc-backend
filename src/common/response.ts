@@ -19,8 +19,8 @@ export class Response<T> implements NestInterceptor {
             }else {
                 return {
                     status: 0,
+                    ...data,
                     message: data?.message || 'ok',
-                    result: data?.data,
                 } 
             }
         }))

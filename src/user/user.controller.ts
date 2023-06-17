@@ -3,11 +3,20 @@ import { UserService } from './user.service';
 import { CreateUserDto, RegisterDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as svgCaptcha from 'svg-captcha'
+import { mac, putPolicy } from './qiniu';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Tag } from './entities/tag.entity';
+import { Repository } from 'typeorm';
 
 
+interface ITag {
+  id?:number
+  key: string
+  label: string
+}
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService, @InjectRepository(Tag) private readonly tag: Repository<Tag>) {}
   /**
    * 获取当前用户信息
    */
@@ -58,32 +67,44 @@ export class UserController {
   }
 
   /**
-   * 添加用户接口
-   * @param createUserDto 
-   * @returns 
+   * 获取qiniu token
    */
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+
+  @Get("uploadToken")
+  getUploadToken(){
+   const uploadToken =  putPolicy.uploadToken(mac)
+   return {message:"获取uploadtoken成功", uploadToken}
   }
 
-  @Get()
-  findAll() {
-    return this.userService.findAll();
+
+  /**
+   * 添加标签
+   */
+  @Post("tag")
+  async createTag(@Body() tags:ITag[], @Req() req){
+ 
+    let {id:userId} = req.currentUser
+    let tagList:ITag[] = []
+    for(let i = 0; i< tags.length; i++){
+      // 先查询,如果标签已存在, 则不创建
+     let isExist =   await this.tag.findOne({where:{ key: tags[i].key, label: tags[i].label}})
+      if(isExist){
+        tagList.push(isExist)
+        continue
+      }
+      const T = new Tag()
+      T.key = tags[i].key
+      T.label = tags[i].label
+      T.userId = userId
+      
+      let res = await this.tag.save(T)
+      tagList.push(res)
+    }
+    return {result: tagList}
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
-  }
 }
+
+
+
+

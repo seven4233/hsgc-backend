@@ -1,10 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto, RegisterDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as jwt from 'jsonwebtoken'
+import { Tag } from './entities/tag.entity';
+
 @Injectable()
 export class UserService {
   constructor(
@@ -17,8 +18,11 @@ export class UserService {
  async getCurrentUser(req){
   const {id} = req.currentUser
   
-  const currentUser =   await this.user.findOneBy(id)
-  return {message:"获取当前用户信息成功", data: currentUser}
+  const currentUser =  await this.user.findOne({
+    relations:['tags'],
+    where: {id}
+  })
+  return {message:"获取当前用户信息成功", result: currentUser}
  }
 
   // 登录
@@ -33,7 +37,8 @@ export class UserService {
     // 生成token
     const payload = {id: res.id, account: res.account}
     const token =  jwt.sign(payload, 'linfeng', {expiresIn: '30 days'})
-    return {message: "登录成功!", data: token};
+
+    return {message: "登录成功!", token };
   }
 
   // 注册
@@ -57,25 +62,4 @@ export class UserService {
     return "注册成功!"
   }
 
-  create(createUserDto: CreateUserDto) {
-    return this.user.save(createUserDto);
-  }
-
-  async findAll() {
-    let users = await this.user.find();
-    return {data: users}
-  }
-
-  findOne(id: number) {
-    const user = this.user.findOneBy({ id });
-    return user;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return this.user.update({ id }, updateUserDto);
-  }
-
-  remove(id: number) {
-    return this.user.softDelete({ id });
-  }
 }
