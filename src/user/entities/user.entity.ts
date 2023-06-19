@@ -85,8 +85,9 @@ export class User {
   // 创建时间
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
+  
   // 更新时间
-  @UpdateDateColumn({ type: 'timestamp' })
+  @UpdateDateColumn({ type: 'timestamp' ,update:true})
   updatedAt: Date;
 
   @DeleteDateColumn()

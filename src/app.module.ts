@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { LoginRequired } from './middleware/auth.midderware';
 import { UserController } from './user/user.controller';
 import { SpiderModule } from './spider/spider.module';
+import { MomentModule } from './moment/moment.module';
 
 @Module({
   imports: [UserModule, TypeOrmModule.forRoot({
@@ -18,7 +19,7 @@ import { SpiderModule } from './spider/spider.module';
     synchronize: true,
     autoLoadEntities: true,
     logging: true
-  }), SpiderModule],
+  }), SpiderModule, MomentModule],
   controllers: [AppController],
   providers: [AppService],
 })
