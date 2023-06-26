@@ -10,8 +10,9 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Tag } from './tag.entity';
+import { Moment } from '../../moment/entities/moment.entity';
 
-@Entity()
+@Entity('user')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -56,9 +57,11 @@ export class User {
 
   // @Column('simple-array', {nullable: true})
   // tags: string[];
-  @OneToMany(() => Tag, (tag) => tag.userId)
+  @OneToMany(() => Tag, (tag) => tag.user)
   tags: Tag[];
 
+  @OneToMany(()=> Moment, (moment)=> moment.ownerId)
+  moments: Moment[]
   // 地址
   @Column('varchar', { nullable: true })
   address: string;

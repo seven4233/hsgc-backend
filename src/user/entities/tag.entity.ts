@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user.entity";
 
-@Entity()
+@Entity('tag')
 export class Tag{
     @PrimaryGeneratedColumn({type: 'bigint'})
     id:number
@@ -13,5 +13,5 @@ export class Tag{
     label: string
 
     @ManyToOne(()=> User)
-    userId: User
+    user: User
 }

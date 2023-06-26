@@ -95,7 +95,7 @@ export class UserController {
       const T = new Tag()
       T.key = tags[i].key
       T.label = tags[i].label
-      T.userId = userId
+      T.user = userId
       
       let res = await this.tag.save(T)
       tagList.push(res)

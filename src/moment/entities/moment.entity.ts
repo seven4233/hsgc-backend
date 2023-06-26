@@ -1,6 +1,5 @@
-import { User } from 'src/user/entities/user.entity';
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-
+import { User } from '../..//user/entities/user.entity';
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 @Entity()
 export class Moment {
   @PrimaryGeneratedColumn({ type: 'bigint' })
@@ -19,17 +18,21 @@ export class Moment {
   status: number;
 
   /**
-   * 发布者 owner
+   * 发布者id owner
    */
   @Column('bigint') 
   ownerId: number; 
+
+  @ManyToOne(()=>User) 
+  user: User; 
+
+  /**
 
   /**
    *  收藏数量 start
    */
   @Column('int', { default: 0 })
-  start: number;
-
+  star: number;
   /**
    *  点赞数量 like
    */
